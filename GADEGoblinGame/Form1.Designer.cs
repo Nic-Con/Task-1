@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.richTextBox1 = new System.Windows.Forms.RichTextBox();
+            this.Output = new System.Windows.Forms.RichTextBox();
             this.MinWid = new System.Windows.Forms.NumericUpDown();
             this.label1 = new System.Windows.Forms.Label();
             this.MaxWid = new System.Windows.Forms.NumericUpDown();
@@ -47,13 +47,13 @@
             ((System.ComponentModel.ISupportInitialize)(this.NumEnemies)).BeginInit();
             this.SuspendLayout();
             // 
-            // richTextBox1
+            // Output
             // 
-            this.richTextBox1.Location = new System.Drawing.Point(-1, 1);
-            this.richTextBox1.Name = "richTextBox1";
-            this.richTextBox1.Size = new System.Drawing.Size(383, 353);
-            this.richTextBox1.TabIndex = 0;
-            this.richTextBox1.Text = "";
+            this.Output.Location = new System.Drawing.Point(-1, 1);
+            this.Output.Name = "Output";
+            this.Output.Size = new System.Drawing.Size(383, 353);
+            this.Output.TabIndex = 0;
+            this.Output.Text = "";
             // 
             // MinWid
             // 
@@ -61,6 +61,11 @@
             this.MinWid.Name = "MinWid";
             this.MinWid.Size = new System.Drawing.Size(120, 20);
             this.MinWid.TabIndex = 1;
+            this.MinWid.Value = new decimal(new int[] {
+            5,
+            0,
+            0,
+            0});
             // 
             // label1
             // 
@@ -74,9 +79,19 @@
             // MaxWid
             // 
             this.MaxWid.Location = new System.Drawing.Point(668, 2);
+            this.MaxWid.Minimum = new decimal(new int[] {
+            3,
+            0,
+            0,
+            0});
             this.MaxWid.Name = "MaxWid";
             this.MaxWid.Size = new System.Drawing.Size(120, 20);
             this.MaxWid.TabIndex = 3;
+            this.MaxWid.Value = new decimal(new int[] {
+            5,
+            0,
+            0,
+            0});
             // 
             // label2
             // 
@@ -108,7 +123,7 @@
             this.MaxHeight.Size = new System.Drawing.Size(120, 20);
             this.MaxHeight.TabIndex = 7;
             this.MaxHeight.Value = new decimal(new int[] {
-            3,
+            5,
             0,
             0,
             0});
@@ -125,16 +140,11 @@
             // MinHeight
             // 
             this.MinHeight.Location = new System.Drawing.Point(477, 28);
-            this.MinHeight.Minimum = new decimal(new int[] {
-            3,
-            0,
-            0,
-            0});
             this.MinHeight.Name = "MinHeight";
             this.MinHeight.Size = new System.Drawing.Size(120, 20);
             this.MinHeight.TabIndex = 5;
             this.MinHeight.Value = new decimal(new int[] {
-            3,
+            5,
             0,
             0,
             0});
@@ -147,6 +157,7 @@
             this.btnStart.TabIndex = 9;
             this.btnStart.Text = "Start";
             this.btnStart.UseVisualStyleBackColor = true;
+            this.btnStart.Click += new System.EventHandler(this.btnStart_Click);
             // 
             // label5
             // 
@@ -190,7 +201,7 @@
             this.Controls.Add(this.MaxWid);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.MinWid);
-            this.Controls.Add(this.richTextBox1);
+            this.Controls.Add(this.Output);
             this.Name = "Form1";
             this.Text = "Form1";
             this.Load += new System.EventHandler(this.Form1_Load);
@@ -206,7 +217,7 @@
 
         #endregion
 
-        private System.Windows.Forms.RichTextBox richTextBox1;
+        private System.Windows.Forms.RichTextBox Output;
         private System.Windows.Forms.NumericUpDown MinWid;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.NumericUpDown MaxWid;

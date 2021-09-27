@@ -22,10 +22,17 @@ namespace GADEGoblinGame
         {
 
         }
+
+        private void btnStart_Click(object sender, EventArgs e)
+        {
+            GameEngine GameEng = new GameEngine((int)Math.Truncate(MinWid.Value), (int)Math.Truncate(MinHeight.Value), (int)Math.Truncate(MaxHeight.Value), (int)Math.Truncate(MaxWid.Value), (int)Math.Truncate(NumEnemies.Value));
+            Output.Text = GameEng.ToString();
+        }
     }
 
     public abstract class Tile
     {
+        
         protected int X
         {
             get { return X; }
@@ -36,6 +43,7 @@ namespace GADEGoblinGame
             get { return Y; }
             set { }
         }
+
         public enum Type
         {
             Hero,
@@ -45,7 +53,14 @@ namespace GADEGoblinGame
             Empty,
             Obstacle
         }
-        
+
+        private Type tileType;
+
+        public Type getTileType()
+        {
+            return this.tileType;
+        }
+
         public int getX()
         {
             return X;
@@ -58,8 +73,10 @@ namespace GADEGoblinGame
 
         public Tile(int NewX, int NewY, Type type)
         {
+            //TODO: Fucked
             X = NewX;
             Y = NewY;
+            this.tileType = type;
         }
 
 
@@ -342,10 +359,24 @@ namespace GADEGoblinGame
     public class Map
     {
         private Tile[,] ArrMap;
+
+        public Tile[,] getMap()
+        {
+            return ArrMap;
+        }
         Hero hero = null;
         private Enemy[] ArrEnemy;
         private int height;
+        public int getHeight()
+        {
+            return height;
+        }
+
         private int width;
+        public int getWidth()
+        {
+            return width;
+        }
         Random rnd = new Random();
 
         public Map(int minW, int minH, int maxH, int maxW, int numEnemy)
@@ -363,12 +394,12 @@ namespace GADEGoblinGame
             for (int i = 0; i < width; i++)
             {
                 ArrMap[i,0] = new Obstacle(i, 0, Tile.Type.Obstacle);
-                ArrMap[i, height] = new Obstacle(i, height, Tile.Type.Obstacle);
+                ArrMap[i, height - 1] = new Obstacle(i, height, Tile.Type.Obstacle);
             }
             for (int i = 0; i < height; i++)
             {
                 ArrMap[0, i] = new Obstacle(0, i, Tile.Type.Obstacle);
-                ArrMap[width, i] = new Obstacle(width, i, Tile.Type.Obstacle);
+                ArrMap[width - 1, i] = new Obstacle(width, i, Tile.Type.Obstacle);
             }
             Create(Tile.Type.Hero);
             ArrMap[hero.getX(), hero.getY()] = hero;
@@ -429,8 +460,8 @@ namespace GADEGoblinGame
             Tile temp = null;
             while (!(ArrMap[x, y] is EmptyTile))
             {
-                x = rnd.Next(1 + width);
-                y = rnd.Next(1 + height);
+                x = rnd.Next(1 , width - 1);
+                y = rnd.Next(1 , height - 1);
             }
             switch (type)
             {
@@ -448,9 +479,42 @@ namespace GADEGoblinGame
     }
     public class GameEngine
     {
+        private Map map;
+        readonly static char Hero = '@';
+        readonly static char Goblin = 'G';
+        readonly static char Empty = '.';
+        readonly static char Obstacle = '#';
         public GameEngine(int minW, int minH, int maxH, int maxW, int numEnemy)
         {
-            Map.Map(minW,minH,maxH,maxW,numEnemy);
+            map = new Map(minW, minH, maxH, maxW, numEnemy);
+        }
+        public override string ToString()
+        {
+            string s = "";
+            for (int i = 0; i < map.getWidth(); i++)
+            {
+                for (int a = 0; a < map.getHeight(); a++)
+                {
+                    
+                    switch (map.getMap()[i, a].getTileType())
+                    {
+                        case Tile.Type.Empty:
+                            s = s + Empty;
+                            break;
+                        case Tile.Type.Enemy:
+                            s = s + Goblin;
+                            break;
+                        case Tile.Type.Hero:
+                            s = s + Hero;
+                            break;
+                        case Tile.Type.Obstacle:
+                            s = s + Obstacle;
+                            break;
+                    }
+                    s = s + "\n";
+                }              
+            }
+            return s;
         }
     }
 }
