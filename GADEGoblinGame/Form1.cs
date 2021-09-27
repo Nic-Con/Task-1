@@ -42,10 +42,19 @@ namespace GADEGoblinGame
             Enemy,
             Gold,
             Weapon,
-            Obstacle,
-            Empty
+            Empty,
+            Obstacle
         }
         
+        public int getX()
+        {
+            return X;
+        }
+
+        public int getY()
+        {
+            return Y;
+        }
 
         public Tile(int NewX, int NewY, Type type)
         {
@@ -91,7 +100,7 @@ namespace GADEGoblinGame
             get { return Damage; }
             set { }
         }
-        public Tile[] ArrTiles = new Tile[4];  //Up, Down, Left, Right
+        public Tile[] ArrVision = new Tile[4];  //Up, Down, Left, Right
 
         public enum Movement
         {
@@ -220,28 +229,28 @@ namespace GADEGoblinGame
                 switch (iCheck)
                 {
                     case 1:
-                        if (ArrTiles[1] is EmptyTile)
+                        if (ArrVision[1] is EmptyTile)
                         {
                             Check = true;
                             temp = Movement.Up;                           
                         }
                         break;
                     case 2:
-                        if (ArrTiles[1] is EmptyTile)
+                        if (ArrVision[1] is EmptyTile)
                         {
                             Check = true;
                             temp = Movement.Down;
                         }
                         break;
                     case 3:
-                        if (ArrTiles[1] is EmptyTile)
+                        if (ArrVision[1] is EmptyTile)
                         {
                             Check = true;
                             temp = Movement.Left;
                         }
                         break;
                     case 4:
-                        if (ArrTiles[1] is EmptyTile)
+                        if (ArrVision[1] is EmptyTile)
                         {
                             Check = true;
                             temp = Movement.Right;
@@ -277,7 +286,7 @@ namespace GADEGoblinGame
             switch (move)
             {
                 case Movement.Up:
-                    if (ArrTiles[1] is EmptyTile)
+                    if (ArrVision[1] is EmptyTile)
                     {
                         temp = Movement.Up;
                     }
@@ -287,7 +296,7 @@ namespace GADEGoblinGame
                     }
                     break;
                 case Movement.Down:
-                    if (ArrTiles[1] is EmptyTile)
+                    if (ArrVision[1] is EmptyTile)
                     {
                         temp = Movement.Down;
                     }
@@ -297,7 +306,7 @@ namespace GADEGoblinGame
                     }
                     break;
                 case Movement.Left:
-                    if (ArrTiles[1] is EmptyTile)
+                    if (ArrVision[1] is EmptyTile)
                     {
                         temp = Movement.Left;
                     }
@@ -307,7 +316,7 @@ namespace GADEGoblinGame
                     }
                     break;
                 case Movement.Right:
-                    if (ArrTiles[1] is EmptyTile)
+                    if (ArrVision[1] is EmptyTile)
                     {
                         temp = Movement.Right;
                     }
@@ -330,12 +339,119 @@ namespace GADEGoblinGame
         }
     }
 
-    public class map
+    public class Map
     {
+        private Tile[,] ArrMap;
+        Hero hero = null;
+        private Enemy[] ArrEnemy;
+        private int height;
+        private int width;
+        Random rnd = new Random();
 
+        public Map(int minW, int minH, int maxH, int maxW, int numEnemy)
+        {
+            height = rnd.Next(minH, maxH + 1);
+            width = rnd.Next(minW, maxW + 1);
+            ArrMap = new Tile[width, height];
+            for (int i = 0; i < width; i++)
+            {
+                for (int a = 0; a < height; a++)
+                {
+                    ArrMap[i,a] = new EmptyTile(i, a, Tile.Type.Empty);
+                }
+            }
+            for (int i = 0; i < width; i++)
+            {
+                ArrMap[i,0] = new Obstacle(i, 0, Tile.Type.Obstacle);
+                ArrMap[i, height] = new Obstacle(i, height, Tile.Type.Obstacle);
+            }
+            for (int i = 0; i < height; i++)
+            {
+                ArrMap[0, i] = new Obstacle(0, i, Tile.Type.Obstacle);
+                ArrMap[width, i] = new Obstacle(width, i, Tile.Type.Obstacle);
+            }
+            Create(Tile.Type.Hero);
+            ArrMap[hero.getX(), hero.getY()] = hero;
+            ArrEnemy = new Enemy[numEnemy];
+            for (int i = 0; i < numEnemy; i++)
+            {
+                ArrEnemy[i] = (Enemy)Create(Tile.Type.Enemy);
+                ArrMap[ArrEnemy[i].getX(), ArrEnemy[i].getY()] = ArrEnemy[i];
+            }
+        }
+        public void UpdateVision()
+        {
+            for (int i = 0; i < ArrEnemy.Length; i++)
+            {
+                for (int a = 0; a < 4; a++) //Up, Down, Left, Right
+                {
+                    switch (a)
+                    {
+                        case 0:
+                            ArrEnemy[i].ArrVision[a] = ArrMap[ArrEnemy[i].getX(), ArrEnemy[i].getY() + 1];
+                        break;
+                        case 1:
+                            ArrEnemy[i].ArrVision[a] = ArrMap[ArrEnemy[i].getX(), ArrEnemy[i].getY() - 1];
+                        break;
+                        case 2:
+                            ArrEnemy[i].ArrVision[a] = ArrMap[ArrEnemy[i].getX() - 1, ArrEnemy[i].getY()];
+                        break;
+                        case 3:
+                            ArrEnemy[i].ArrVision[a] = ArrMap[ArrEnemy[i].getX() + 1, ArrEnemy[i].getY()];
+                        break;
+                    }          
+                }
+                
+            }
+            for (int a = 0; a < 4; a++) //Up, Down, Left, Right
+            {
+                switch (a)
+                {
+                    case 0:
+                        hero.ArrVision[a] = ArrMap[hero.getX(), hero.getY() + 1];
+                        break;
+                    case 1:
+                        hero.ArrVision[a] = ArrMap[hero.getX(), hero.getY() - 1];
+                        break;
+                    case 2:
+                        hero.ArrVision[a] = ArrMap[hero.getX() - 1, hero.getY()];
+                        break;
+                    case 3:
+                        hero.ArrVision[a] = ArrMap[hero.getX() + 1, hero.getY()];
+                        break;
+                }
+            }
+        }
+        private Tile Create(Tile.Type type)
+        {
+            int x = 0;
+            int y = 0;
+            Tile temp = null;
+            while (!(ArrMap[x, y] is EmptyTile))
+            {
+                x = rnd.Next(1 + width);
+                y = rnd.Next(1 + height);
+            }
+            switch (type)
+            {
+                case Tile.Type.Hero:
+                    hero = new Hero(x, y, 0, 20);
+                    temp = hero;
+                    break;
+                case Tile.Type.Enemy:
+                    Goblin goblin = new Goblin(x, y, 0, 10, 1);
+                    temp = goblin;
+                    break;
+            }
+            return temp;
+        }
     }
-
-
-
+    public class GameEngine
+    {
+        public GameEngine(int minW, int minH, int maxH, int maxW, int numEnemy)
+        {
+            Map.Map(minW,minH,maxH,maxW,numEnemy);
+        }
+    }
 }
 
