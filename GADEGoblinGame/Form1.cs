@@ -35,13 +35,13 @@ namespace GADEGoblinGame
         
         protected int X
         {
-            get { return X; }
-            set { }
+            get;
+            set;
         }
         protected int Y
         {
-            get { return Y; }
-            set { }
+            get;
+            set;
         }
 
         public enum Type
@@ -73,7 +73,6 @@ namespace GADEGoblinGame
 
         public Tile(int NewX, int NewY, Type type)
         {
-            //TODO: Fucked
             X = NewX;
             Y = NewY;
             this.tileType = type;
@@ -482,7 +481,7 @@ namespace GADEGoblinGame
         private Map map;
         readonly static char Hero = '@';
         readonly static char Goblin = 'G';
-        readonly static char Empty = '.';
+        readonly static char Empty = '%';
         readonly static char Obstacle = '#';
         public GameEngine(int minW, int minH, int maxH, int maxW, int numEnemy)
         {
@@ -510,9 +509,9 @@ namespace GADEGoblinGame
                         case Tile.Type.Obstacle:
                             s = s + Obstacle;
                             break;
-                    }
-                    s = s + "\n";
-                }              
+                    }                    
+                }
+                s = s + "\n";
             }
             return s;
         }
