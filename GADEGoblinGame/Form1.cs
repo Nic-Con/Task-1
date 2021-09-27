@@ -199,7 +199,7 @@ namespace GADEGoblinGame
         }
     }
 
-   /* public class Goblin : Enemy
+    public class Goblin : Enemy
     {
         public Goblin(int NewX, int NewY, Type type, int NewMaxHP, int NewDamage) : base(NewX, NewY, type, NewMaxHP, NewDamage)
         {
@@ -213,24 +213,122 @@ namespace GADEGoblinGame
         public override Movement ReturnMove(Movement move)
         {
             bool Check = false;
+            Movement temp = Movement.None;
             while (Check == false)
             { 
                 int iCheck = rnd.Next(1, 5); //Up, Down, Left, Right 
                 switch (iCheck)
                 {
                     case 1:
-                        if ()ArrTiles[1] = "Empty";
+                        if (ArrTiles[1] is EmptyTile)
+                        {
+                            Check = true;
+                            temp = Movement.Up;                           
+                        }
+                        break;
+                    case 2:
+                        if (ArrTiles[1] is EmptyTile)
+                        {
+                            Check = true;
+                            temp = Movement.Down;
+                        }
+                        break;
+                    case 3:
+                        if (ArrTiles[1] is EmptyTile)
+                        {
+                            Check = true;
+                            temp = Movement.Left;
+                        }
+                        break;
+                    case 4:
+                        if (ArrTiles[1] is EmptyTile)
+                        {
+                            Check = true;
+                            temp = Movement.Right;
+                        }
                         break;
                 }
                     
             }
+
+            return temp;
         }
 
         public override string ToString()
         {  
             return "Goblin " + base.ToString();
         }
-    }*/
+    }
+
+    public class Hero : Character
+    {
+        public Hero(int NewX, int NewY, Type type, int NewMaxHP) : base(NewX, NewY, type)
+        {
+            X = NewX;
+            Y = NewY;
+            HP = NewMaxHP;
+            MaxHP = NewMaxHP;
+            Damage = 2;
+        }
+
+        public override Movement ReturnMove(Movement move)
+        {
+            Movement temp = move;
+            switch (move)
+            {
+                case Movement.Up:
+                    if (ArrTiles[1] is EmptyTile)
+                    {
+                        temp = Movement.Up;
+                    }
+                    else
+                    {
+                        temp = Movement.None;
+                    }
+                    break;
+                case Movement.Down:
+                    if (ArrTiles[1] is EmptyTile)
+                    {
+                        temp = Movement.Down;
+                    }
+                    else
+                    {
+                        temp = Movement.None;
+                    }
+                    break;
+                case Movement.Left:
+                    if (ArrTiles[1] is EmptyTile)
+                    {
+                        temp = Movement.Left;
+                    }
+                    else
+                    {
+                        temp = Movement.None;
+                    }
+                    break;
+                case Movement.Right:
+                    if (ArrTiles[1] is EmptyTile)
+                    {
+                        temp = Movement.Right;
+                    }
+                    else
+                    {
+                        temp = Movement.None;
+                    }
+                    break;
+            }
+            return temp;
+        }
+
+        public override string ToString()
+        {
+            string s = "Player Stats: \n";
+            s = s + "HP: " + HP + "/" + MaxHP + "\n";
+            s = s + "Damage: " + Damage + "\n";
+            s = s + "[" + X + "," + Y + "]";
+            return s;
+        }
+    }
 
     public class map
     {
