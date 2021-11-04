@@ -12,10 +12,11 @@ namespace GADEGoblinGame
 {
     public partial class Form1 : Form
     {
+        GameEngine GameEng;
         public Form1()
         {
             InitializeComponent();
-
+            
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -25,12 +26,18 @@ namespace GADEGoblinGame
 
         private void btnStart_Click(object sender, EventArgs e)
         {
-            GameEngine GameEng = new GameEngine((int)Math.Truncate(MinWid.Value), (int)Math.Truncate(MinHeight.Value), (int)Math.Truncate(MaxHeight.Value), (int)Math.Truncate(MaxWid.Value), (int)Math.Truncate(NumEnemies.Value));
+            GameEng = new GameEngine((int)Math.Truncate(MinWid.Value), (int)Math.Truncate(MinHeight.Value), (int)Math.Truncate(MaxHeight.Value), (int)Math.Truncate(MaxWid.Value), (int)Math.Truncate(NumEnemies.Value));
             Output.Text = GameEng.ToString();
             btnDown.Enabled = true;
             btnUp.Enabled = true;
             btnLeft.Enabled = true;
             btnRight.Enabled = true;
+        }
+
+        private void btnUp_Click(object sender, EventArgs e)
+        {
+            GameEng.MoveUp();
+            Output.Text = GameEng.ToString();
         }
     }
 
@@ -52,6 +59,7 @@ namespace GADEGoblinGame
         {
             Hero,
             Enemy,
+            Goblin,
             Gold,
             Weapon,
             Empty,
@@ -105,21 +113,9 @@ namespace GADEGoblinGame
 
     public abstract class Character : Tile
     {
-        protected int MaxHP
-        {
-            get { return MaxHP; }
-            set { }
-        }
-        protected int HP
-        {
-            get { return HP; }
-            set { }
-        }
-        protected int Damage
-        {
-            get { return Damage; }
-            set { }
-        }
+        protected int MaxHP { get; set; }
+        protected int HP { get; set; }
+        protected int Damage { get; set; }
         public Tile[] ArrVision = new Tile[4];  //Up, Down, Left, Right
 
         public enum Movement
@@ -249,21 +245,21 @@ namespace GADEGoblinGame
                 switch (iCheck)
                 {
                     case 1:
-                        if (ArrVision[1] is EmptyTile)
+                        if (ArrVision[2] is EmptyTile)
                         {
                             Check = true;
                             temp = Movement.Up;                           
                         }
                         break;
                     case 2:
-                        if (ArrVision[1] is EmptyTile)
+                        if (ArrVision[3] is EmptyTile)
                         {
                             Check = true;
                             temp = Movement.Down;
                         }
                         break;
                     case 3:
-                        if (ArrVision[1] is EmptyTile)
+                        if (ArrVision[0] is EmptyTile)
                         {
                             Check = true;
                             temp = Movement.Left;
@@ -367,8 +363,12 @@ namespace GADEGoblinGame
         {
             return ArrMap;
         }
-        Hero hero = null;
+        public Hero hero = null;
         private Enemy[] ArrEnemy;
+        public Enemy[] getEnemy()
+        {
+            return ArrEnemy;
+        }
         private int height;
         public int getHeight()
         {
@@ -417,7 +417,7 @@ namespace GADEGoblinGame
         {
             for (int i = 0; i < ArrEnemy.Length; i++)
             {
-                for (int a = 0; a < 4; a++) //Up, Down, Left, Right
+                for (int a = 0; a < 4; a++) //left, right, up, down
                 {
                     switch (a)
                     {
@@ -473,23 +473,11 @@ namespace GADEGoblinGame
                     temp = hero;
                     break;
                 case Tile.Type.Enemy:
-                    Goblin goblin = new Goblin(x, y, 0, 10, 1);
+                    Goblin goblin = new Goblin(x, y, Tile.Type.Goblin, 10, 1);
                     temp = goblin;
                     break;
             }
             return temp;
-        }
-        private void btnUp_Click(object sender, EventArgs e)
-        {
-            Tile.Type temp = (getMap()[hero.getX(), (hero.getY() + 1)].getTileType());
-            if (hero.ReturnMove(Character.Movement.Up) != Character.Movement.None)
-            {
-                hero.Move(hero.ReturnMove(Character.Movement.Up));
-            }
-            else if (temp == Tile.Type.Enemy)
-            {
-                hero.Attack(getMap()[hero.getX(), (hero.getY() + 1)]);       
-            }
         }
     }
     public class GameEngine
@@ -516,7 +504,7 @@ namespace GADEGoblinGame
                         case Tile.Type.Empty:
                             s = s + Empty;
                             break;
-                        case Tile.Type.Enemy:
+                        case Tile.Type.Goblin:
                             s = s + Goblin;
                             break;
                         case Tile.Type.Hero:
@@ -530,6 +518,33 @@ namespace GADEGoblinGame
                 s = s + "\n";
             }
             return s;
+        }
+        public void MoveUp()
+        {
+            map.UpdateVision();
+            Tile.Type temp = (map.getMap()[map.hero.getX() - 1, (map.hero.getY())].getTileType());
+            if (map.hero.ReturnMove(Character.Movement.Up) != Character.Movement.None)
+            {
+                map.getMap()[map.hero.getX() - 1, (map.hero.getY())] = map.getMap()[map.hero.getX(), map.hero.getY()];
+                map.getMap()[map.hero.getX(), map.hero.getY()] = new EmptyTile(map.hero.getX(), map.hero.getY(), Tile.Type.Empty);
+                map.hero.Move(map.hero.ReturnMove(Character.Movement.Up));
+            }
+            else if (temp == Tile.Type.Enemy)
+            {
+                map.hero.Attack((Enemy)map.getMap()[map.hero.getX() - 1, (map.hero.getY())]);
+            }
+            for (int i = 0; i < map.getEnemy().Length; i++)
+            {
+                if (map.getEnemy()[i].IsDead())
+                {
+
+                    map.getMap()[map.getEnemy()[i].getX(), map.getEnemy()[i].getY()] = new EmptyTile(map.getEnemy()[i].getX(), map.getEnemy()[i].getY(), Tile.Type.Empty);
+                }
+                else
+                {
+                    map.getEnemy()[i].Move(map.getEnemy()[i].ReturnMove(Character.Movement.None));
+                }
+            }
         }
     }
 }
