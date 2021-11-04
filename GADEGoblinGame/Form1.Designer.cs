@@ -40,6 +40,10 @@
             this.btnStart = new System.Windows.Forms.Button();
             this.label5 = new System.Windows.Forms.Label();
             this.NumEnemies = new System.Windows.Forms.NumericUpDown();
+            this.btnUp = new System.Windows.Forms.Button();
+            this.btnLeft = new System.Windows.Forms.Button();
+            this.btnDown = new System.Windows.Forms.Button();
+            this.btnRight = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.MinWid)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.MaxWid)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.MaxHeight)).BeginInit();
@@ -62,7 +66,7 @@
             this.MinWid.Size = new System.Drawing.Size(120, 20);
             this.MinWid.TabIndex = 1;
             this.MinWid.Value = new decimal(new int[] {
-            5,
+            10,
             0,
             0,
             0});
@@ -88,7 +92,7 @@
             this.MaxWid.Size = new System.Drawing.Size(120, 20);
             this.MaxWid.TabIndex = 3;
             this.MaxWid.Value = new decimal(new int[] {
-            5,
+            10,
             0,
             0,
             0});
@@ -123,7 +127,7 @@
             this.MaxHeight.Size = new System.Drawing.Size(120, 20);
             this.MaxHeight.TabIndex = 7;
             this.MaxHeight.Value = new decimal(new int[] {
-            5,
+            10,
             0,
             0,
             0});
@@ -144,7 +148,7 @@
             this.MinHeight.Size = new System.Drawing.Size(120, 20);
             this.MinHeight.TabIndex = 5;
             this.MinHeight.Value = new decimal(new int[] {
-            5,
+            10,
             0,
             0,
             0});
@@ -180,16 +184,65 @@
             this.NumEnemies.Size = new System.Drawing.Size(299, 20);
             this.NumEnemies.TabIndex = 10;
             this.NumEnemies.Value = new decimal(new int[] {
-            1,
+            4,
             0,
             0,
             0});
+            // 
+            // btnUp
+            // 
+            this.btnUp.Enabled = false;
+            this.btnUp.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnUp.Location = new System.Drawing.Point(550, 246);
+            this.btnUp.Name = "btnUp";
+            this.btnUp.Size = new System.Drawing.Size(56, 51);
+            this.btnUp.TabIndex = 12;
+            this.btnUp.Text = "/\\";
+            this.btnUp.UseVisualStyleBackColor = true;
+            this.btnUp.Click += new System.EventHandler(this.btnUp_Click);
+            // 
+            // btnLeft
+            // 
+            this.btnLeft.Enabled = false;
+            this.btnLeft.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnLeft.Location = new System.Drawing.Point(494, 303);
+            this.btnLeft.Name = "btnLeft";
+            this.btnLeft.Size = new System.Drawing.Size(56, 51);
+            this.btnLeft.TabIndex = 13;
+            this.btnLeft.Text = "<";
+            this.btnLeft.UseVisualStyleBackColor = true;
+            // 
+            // btnDown
+            // 
+            this.btnDown.Enabled = false;
+            this.btnDown.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnDown.Location = new System.Drawing.Point(550, 303);
+            this.btnDown.Name = "btnDown";
+            this.btnDown.Size = new System.Drawing.Size(56, 51);
+            this.btnDown.TabIndex = 14;
+            this.btnDown.Text = "\\/";
+            this.btnDown.UseVisualStyleBackColor = true;
+            // 
+            // btnRight
+            // 
+            this.btnRight.Enabled = false;
+            this.btnRight.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnRight.Location = new System.Drawing.Point(606, 303);
+            this.btnRight.Name = "btnRight";
+            this.btnRight.Size = new System.Drawing.Size(56, 51);
+            this.btnRight.TabIndex = 15;
+            this.btnRight.Text = ">";
+            this.btnRight.UseVisualStyleBackColor = true;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.ClientSize = new System.Drawing.Size(800, 361);
+            this.Controls.Add(this.btnRight);
+            this.Controls.Add(this.btnDown);
+            this.Controls.Add(this.btnLeft);
+            this.Controls.Add(this.btnUp);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.NumEnemies);
             this.Controls.Add(this.btnStart);
@@ -229,6 +282,10 @@
         private System.Windows.Forms.Button btnStart;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.NumericUpDown NumEnemies;
+        private System.Windows.Forms.Button btnUp;
+        private System.Windows.Forms.Button btnLeft;
+        private System.Windows.Forms.Button btnDown;
+        private System.Windows.Forms.Button btnRight;
     }
 }
 

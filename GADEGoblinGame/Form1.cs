@@ -27,6 +27,10 @@ namespace GADEGoblinGame
         {
             GameEngine GameEng = new GameEngine((int)Math.Truncate(MinWid.Value), (int)Math.Truncate(MinHeight.Value), (int)Math.Truncate(MaxHeight.Value), (int)Math.Truncate(MaxWid.Value), (int)Math.Truncate(NumEnemies.Value));
             Output.Text = GameEng.ToString();
+            btnDown.Enabled = true;
+            btnUp.Enabled = true;
+            btnLeft.Enabled = true;
+            btnRight.Enabled = true;
         }
     }
 
@@ -475,13 +479,25 @@ namespace GADEGoblinGame
             }
             return temp;
         }
+        private void btnUp_Click(object sender, EventArgs e)
+        {
+            Tile.Type temp = (getMap()[hero.getX(), (hero.getY() + 1)].getTileType());
+            if (hero.ReturnMove(Character.Movement.Up) != Character.Movement.None)
+            {
+                hero.Move(hero.ReturnMove(Character.Movement.Up));
+            }
+            else if (temp == Tile.Type.Enemy)
+            {
+                hero.Attack(getMap()[hero.getX(), (hero.getY() + 1)]);       
+            }
+        }
     }
     public class GameEngine
     {
         private Map map;
-        readonly static char Hero = '@';
+        readonly static char Hero = 'H';
         readonly static char Goblin = 'G';
-        readonly static char Empty = '%';
+        readonly static char Empty = '~';
         readonly static char Obstacle = '#';
         public GameEngine(int minW, int minH, int maxH, int maxW, int numEnemy)
         {
