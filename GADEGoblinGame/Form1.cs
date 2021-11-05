@@ -537,12 +537,33 @@ namespace GADEGoblinGame
             {
                 if (map.getEnemy()[i].IsDead())
                 {
-
                     map.getMap()[map.getEnemy()[i].getX(), map.getEnemy()[i].getY()] = new EmptyTile(map.getEnemy()[i].getX(), map.getEnemy()[i].getY(), Tile.Type.Empty);
                 }
                 else
                 {
-                    map.getEnemy()[i].Move(map.getEnemy()[i].ReturnMove(Character.Movement.None));
+                    Character.Movement temp2 = map.getEnemy()[i].ReturnMove(Character.Movement.None);
+                    map.getEnemy()[i].Move(temp2);
+                    switch (temp2)
+                    {
+                        case Character.Movement.Up:
+                            map.getMap()[map.getEnemy()[i].getX() - 1, map.getEnemy()[i].getY()] = map.getMap()[map.getEnemy()[i].getX(), map.getEnemy()[i].getY()];
+                            map.getMap()[map.getEnemy()[i].getX(), map.getEnemy()[i].getY()] = new EmptyTile(map.getEnemy()[i].getX(), map.getEnemy()[i].getY(), Tile.Type.Empty);
+                            break;
+                        case Character.Movement.Down:
+                            map.getMap()[map.getEnemy()[i].getX() + 1, map.getEnemy()[i].getY()] = map.getMap()[map.getEnemy()[i].getX(), map.getEnemy()[i].getY()];
+                            map.getMap()[map.getEnemy()[i].getX(), map.getEnemy()[i].getY()] = new EmptyTile(map.getEnemy()[i].getX(), map.getEnemy()[i].getY(), Tile.Type.Empty);
+                            break;
+                        case Character.Movement.Left:
+                            map.getMap()[map.getEnemy()[i].getX(), map.getEnemy()[i].getY() + 1] = map.getMap()[map.getEnemy()[i].getX(), map.getEnemy()[i].getY()];
+                            map.getMap()[map.getEnemy()[i].getX(), map.getEnemy()[i].getY()] = new EmptyTile(map.getEnemy()[i].getX(), map.getEnemy()[i].getY(), Tile.Type.Empty);
+                            break;
+                        case Character.Movement.Right:
+                            map.getMap()[map.getEnemy()[i].getX(), map.getEnemy()[i].getY() - 1] = map.getMap()[map.getEnemy()[i].getX(), map.getEnemy()[i].getY()];
+                            map.getMap()[map.getEnemy()[i].getX(), map.getEnemy()[i].getY()] = new EmptyTile(map.getEnemy()[i].getX(), map.getEnemy()[i].getY(), Tile.Type.Empty);
+                            break;
+                        default:
+                            break;
+                    }
                 }
             }
         }
