@@ -33,12 +33,25 @@ namespace GADEGoblinGame
             btnUp.Enabled = true;
             btnLeft.Enabled = true;
             btnRight.Enabled = true;*/
+            btnSave.Enabled = true;
+            btnLoad.Enabled = true;
         }
 
         private void btnUp_Click(object sender, EventArgs e)
         {
             /*GameEng.MoveUp();
             Output.Text = GameEng.ToString();*/
+        }
+
+        private void btnSave_Click(object sender, EventArgs e)
+        {
+            BinarySerialization.WriteToBinaryFile(@"..\Save Folder\SaveFile.bin", GameEng.GetMap());
+        }
+
+        private void btnLoad_Click(object sender, EventArgs e)
+        {
+            GameEng.SetMap((Map)BinarySerialization.ReadFromBinaryFile(@"..\Save Folder\SaveFile.bin"));
+            Output.Text = GameEng.ToString();
         }
     }
 
@@ -64,6 +77,7 @@ namespace GADEGoblinGame
         }
     }
 
+    [Serializable]
     public abstract class Tile
     {
 
@@ -117,6 +131,7 @@ namespace GADEGoblinGame
 
     }
 
+    [Serializable]
     class Obstacle : Tile
     {
         public Obstacle(int NewX, int NewY, Type type) : base(NewX, NewY, type)
@@ -126,6 +141,7 @@ namespace GADEGoblinGame
         }
     }
 
+    [Serializable]
     public class EmptyTile : Tile
     {
         public EmptyTile(int NewX, int NewY, Type type) : base(NewX, NewY, type)
@@ -135,6 +151,7 @@ namespace GADEGoblinGame
         }
     }
 
+    [Serializable]
     public abstract class Item : Tile
     {
         public Item(int NewX, int NewY, Type type) : base(NewX, NewY, type)
@@ -145,6 +162,7 @@ namespace GADEGoblinGame
         public abstract override string ToString();
     }
 
+    [Serializable]
     public class Gold : Item
     {
         public int Amount;
@@ -161,6 +179,7 @@ namespace GADEGoblinGame
         }
     }
 
+    [Serializable]
     public abstract class Character : Tile
     {
         protected int MaxHP { get; set; }
@@ -265,6 +284,8 @@ namespace GADEGoblinGame
         public abstract Movement ReturnMove(Movement move);
         public abstract override string ToString();
     }
+
+    [Serializable]
     public abstract class Enemy : Character
     {
         protected Random rnd = new Random();
@@ -282,6 +303,7 @@ namespace GADEGoblinGame
         }
     }
 
+    [Serializable]
     public class Goblin : Enemy
     {
         public Goblin(int NewX, int NewY, Type type, int NewMaxHP, int NewDamage) : base(NewX, NewY, type, NewMaxHP, NewDamage)
@@ -343,6 +365,7 @@ namespace GADEGoblinGame
         }
     }
 
+    [Serializable]
     public class Mage : Enemy
     {
         public Mage(int NewX, int NewY, Type type, int NewMaxHP, int NewDamage) : base(NewX, NewY, type, NewMaxHP, NewDamage)
@@ -372,6 +395,7 @@ namespace GADEGoblinGame
         }
     }
 
+    [Serializable]
     public class Hero : Character
     {
         public Hero(int NewX, int NewY, Type type, int NewMaxHP) : base(NewX, NewY, type)
@@ -515,7 +539,6 @@ namespace GADEGoblinGame
             {
                 int x = 0;
                 int y = 0;
-                Tile temp = null;
                 while (!(ArrMap[x, y] is EmptyTile))
                 {
                     x = rnd.Next(1, width - 1);
@@ -606,6 +629,8 @@ namespace GADEGoblinGame
         }
 
     }
+
+    [Serializable]
     public class GameEngine
     {
         private Map map;
@@ -619,6 +644,17 @@ namespace GADEGoblinGame
         {
             map = new Map(minW, minH, maxH, maxW, numEnemy);
         }
+
+        public Map GetMap()
+        {
+            return this.map;
+        }
+
+        public void SetMap(Map newmap)
+        {
+            map = newmap;
+        }
+
         public override string ToString()
         {
             string s = "";
