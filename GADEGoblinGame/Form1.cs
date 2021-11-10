@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,7 +17,7 @@ namespace GADEGoblinGame
         public Form1()
         {
             InitializeComponent();
-            
+
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -41,9 +42,31 @@ namespace GADEGoblinGame
         }
     }
 
+    public static class BinarySerialization
+    {
+        public static void WriteToBinaryFile(string filePath, object ObjectToWrite)
+        {
+            using (Stream stream = File.Open(filePath, FileMode.Create))
+            {
+                var binaryFormatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
+                binaryFormatter.Serialize(stream, ObjectToWrite);
+            }
+        }
+
+        public static object ReadFromBinaryFile(string filePath)
+        {
+            using (Stream stream = File.Open(filePath, FileMode.Open))
+            {
+                var binaryFormatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
+                return (object)binaryFormatter.Deserialize(stream);
+            }
+
+        }
+    }
+
     public abstract class Tile
     {
-        
+
         protected int X
         {
             get;
@@ -144,7 +167,7 @@ namespace GADEGoblinGame
         protected int HP { get; set; }
         protected int Damage { get; set; }
         public Tile[] ArrVision = new Tile[4];  //Up, Down, Left, Right
-        public int AmountGold { get; set; }; 
+        public int AmountGold { get; set; }
 
         public enum Movement
         {
@@ -215,7 +238,7 @@ namespace GADEGoblinGame
         }
         public void Move(Movement move)
         {
-            switch(move)
+            switch (move)
             {
                 case Movement.Up:
                     Y = Y + 1;
@@ -235,7 +258,7 @@ namespace GADEGoblinGame
         {
             if (item.getTileType() == Tile.Type.Gold)
             {
-                AmountGold = AmountGold + ((Gold)item).Amount; 
+                AmountGold = AmountGold + ((Gold)item).Amount;
             }
         }
 
@@ -275,7 +298,7 @@ namespace GADEGoblinGame
             bool Check = false;
             Movement temp = Movement.None;
             while (Check == false)
-            { 
+            {
                 int iCheck = rnd.Next(1, 5); //Up, Down, Left, Right 
                 switch (iCheck)
                 {
@@ -283,7 +306,7 @@ namespace GADEGoblinGame
                         if (ArrVision[2] is EmptyTile)
                         {
                             Check = true;
-                            temp = Movement.Up;                           
+                            temp = Movement.Up;
                         }
                         break;
                     case 2:
@@ -308,14 +331,14 @@ namespace GADEGoblinGame
                         }
                         break;
                 }
-                    
+
             }
 
             return temp;
         }
 
         public override string ToString()
-        {  
+        {
             return "Goblin " + base.ToString();
         }
     }
@@ -419,7 +442,8 @@ namespace GADEGoblinGame
             return s;
         }
     }
-
+    
+    [Serializable]
     public class Map
     {
         private Tile[,] ArrMap;
@@ -570,7 +594,16 @@ namespace GADEGoblinGame
             return temp;
         }
         
-
+        public Item getItemAtPosition(int x, int y)
+        {
+            Item temp = null;
+            if (getMap()[x,y] is Item)
+            {
+                temp = (Item)getMap()[x, y];
+                getMap()[x, y] = new EmptyTile(x, y, Tile.Type.Empty);
+            }
+            return temp;
+        }
 
     }
     public class GameEngine
@@ -620,20 +653,43 @@ namespace GADEGoblinGame
             }
             return s;
         }
-        /*public void MoveUp()
+
+        public void EnemyAttacks()
         {
-            map.UpdateVision();
-            Tile.Type temp = (map.getMap()[map.hero.getX() - 1, (map.hero.getY())].getTileType());
-            if (map.hero.ReturnMove(Character.Movement.Up) != Character.Movement.None)
+            for (int i = 0; i < map.getEnemy().Length; i++)
             {
-                map.getMap()[map.hero.getX() - 1, (map.hero.getY())] = map.getMap()[map.hero.getX(), map.hero.getY()];
-                map.getMap()[map.hero.getX(), map.hero.getY()] = new EmptyTile(map.hero.getX(), map.hero.getY(), Tile.Type.Empty);
-                map.hero.Move(map.hero.ReturnMove(Character.Movement.Up));
+                if (map.getEnemy()[i].getTileType() == Tile.Type.Mage)
+                {
+                    for (int j = 0; j < map.getEnemy().Length; j++)
+                    {
+                        if (i != j)
+                        {
+                            if (map.getEnemy()[i].CheckRange(map.getEnemy()[j]))
+                            {
+                                map.getEnemy()[i].Attack(map.getEnemy()[j]);
+                            }
+                        }
+                    }
+                    if (map.getEnemy()[i].CheckRange(map.hero))
+                    {
+                        map.getEnemy()[i].Attack(map.hero);
+                    }
+                }
+                else
+                {
+                    for (int j = 0; j < map.getEnemy()[j].ArrVision.Length; j++)
+                    {
+                        if (map.getEnemy()[j].ArrVision[j].getTileType() == Tile.Type.Hero)
+                        {
+                            map.getEnemy()[j].Attack(map.hero);
+                        }        
+                    }
+                }
             }
-            else if (temp == Tile.Type.Enemy)
-            {
-                map.hero.Attack((Enemy)map.getMap()[map.hero.getX() - 1, (map.hero.getY())]);
-            }
+        }
+
+        public void MoveEnemies()
+        {
             for (int i = 0; i < map.getEnemy().Length; i++)
             {
                 if (map.getEnemy()[i].IsDead())
@@ -667,6 +723,24 @@ namespace GADEGoblinGame
                     }
                 }
             }
+        }
+
+
+
+        /*public void MoveUp()
+        {
+            map.UpdateVision();
+            Tile.Type temp = (map.getMap()[map.hero.getX() - 1, (map.hero.getY())].getTileType());
+            if (map.hero.ReturnMove(Character.Movement.Up) != Character.Movement.None)
+            {
+                map.getMap()[map.hero.getX() - 1, (map.hero.getY())] = map.getMap()[map.hero.getX(), map.hero.getY()];
+                map.getMap()[map.hero.getX(), map.hero.getY()] = new EmptyTile(map.hero.getX(), map.hero.getY(), Tile.Type.Empty);
+                map.hero.Move(map.hero.ReturnMove(Character.Movement.Up));
+            }
+            else if (temp == Tile.Type.Enemy)
+            {
+                map.hero.Attack((Enemy)map.getMap()[map.hero.getX() - 1, (map.hero.getY())]);
+            }            
         } */
     }
 }
