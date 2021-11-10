@@ -28,16 +28,16 @@ namespace GADEGoblinGame
         {
             GameEng = new GameEngine((int)Math.Truncate(MinWid.Value), (int)Math.Truncate(MinHeight.Value), (int)Math.Truncate(MaxHeight.Value), (int)Math.Truncate(MaxWid.Value), (int)Math.Truncate(NumEnemies.Value));
             Output.Text = GameEng.ToString();
-            btnDown.Enabled = true;
+            /*btnDown.Enabled = true;
             btnUp.Enabled = true;
             btnLeft.Enabled = true;
-            btnRight.Enabled = true;
+            btnRight.Enabled = true;*/
         }
 
         private void btnUp_Click(object sender, EventArgs e)
         {
-            GameEng.MoveUp();
-            Output.Text = GameEng.ToString();
+            /*GameEng.MoveUp();
+            Output.Text = GameEng.ToString();*/
         }
     }
 
@@ -59,11 +59,12 @@ namespace GADEGoblinGame
         {
             Hero,
             Enemy,
-            Goblin,
             Gold,
             Weapon,
             Empty,
-            Obstacle
+            Obstacle,
+            Goblin,
+            Mage
         }
 
         private Type tileType;
@@ -111,12 +112,39 @@ namespace GADEGoblinGame
         }
     }
 
+    public abstract class Item : Tile
+    {
+        public Item(int NewX, int NewY, Type type) : base(NewX, NewY, type)
+        {
+            X = NewX;
+            Y = NewY;
+        }
+        public abstract override string ToString();
+    }
+
+    public class Gold : Item
+    {
+        public int Amount;
+        private Random rand = new Random();
+        public Gold(int NewX, int NewY, Type type) : base(NewX, NewY, type)
+        {
+            X = NewX;
+            Y = NewY;
+            Amount = rand.Next(1, 6);
+        }
+        public override string ToString()
+        {
+            return "Gold";
+        }
+    }
+
     public abstract class Character : Tile
     {
         protected int MaxHP { get; set; }
         protected int HP { get; set; }
         protected int Damage { get; set; }
         public Tile[] ArrVision = new Tile[4];  //Up, Down, Left, Right
+        public int AmountGold { get; set; }; 
 
         public enum Movement
         {
@@ -146,7 +174,7 @@ namespace GADEGoblinGame
                 return false;
             }
         }
-        private int DistanceTo(Character Target)
+        public int DistanceTo(Character Target)
         {
             double calculate;
             double XCalc;
@@ -201,6 +229,13 @@ namespace GADEGoblinGame
                 case Movement.Right:
                     X = X + 1;
                     break;
+            }
+        }
+        public void Pickup(Item item)
+        {
+            if (item.getTileType() == Tile.Type.Gold)
+            {
+                AmountGold = AmountGold + ((Gold)item).Amount; 
             }
         }
 
@@ -285,6 +320,35 @@ namespace GADEGoblinGame
         }
     }
 
+    public class Mage : Enemy
+    {
+        public Mage(int NewX, int NewY, Type type, int NewMaxHP, int NewDamage) : base(NewX, NewY, type, NewMaxHP, NewDamage)
+        {
+            X = NewX;
+            Y = NewY;
+            HP = 5;
+            MaxHP = 5;
+            Damage = 5;
+        }
+
+        public override Movement ReturnMove(Movement move)
+        {
+            return Movement.None;
+        }
+
+        public override bool CheckRange(Character Target)
+        {
+            if (DistanceTo(Target) == 1)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+    }
+
     public class Hero : Character
     {
         public Hero(int NewX, int NewY, Type type, int NewMaxHP) : base(NewX, NewY, type)
@@ -350,6 +414,7 @@ namespace GADEGoblinGame
             string s = "Player Stats: \n";
             s = s + "HP: " + HP + "/" + MaxHP + "\n";
             s = s + "Damage: " + Damage + "\n";
+            s = s + "Gold: " + AmountGold;
             s = s + "[" + X + "," + Y + "]";
             return s;
         }
@@ -409,8 +474,30 @@ namespace GADEGoblinGame
             ArrEnemy = new Enemy[numEnemy];
             for (int i = 0; i < numEnemy; i++)
             {
-                ArrEnemy[i] = (Enemy)Create(Tile.Type.Enemy);
-                ArrMap[ArrEnemy[i].getX(), ArrEnemy[i].getY()] = ArrEnemy[i];
+                if (rnd.Next(1,7) < 6)
+                {
+                    ArrEnemy[i] = (Enemy)Create(Tile.Type.Goblin);
+                    ArrMap[ArrEnemy[i].getX(), ArrEnemy[i].getY()] = ArrEnemy[i];
+                }
+                else
+                {
+                    ArrEnemy[i] = (Enemy)Create(Tile.Type.Mage);
+                    ArrMap[ArrEnemy[i].getX(), ArrEnemy[i].getY()] = ArrEnemy[i];
+                }
+                
+            }
+            int itemp = rnd.Next(1, 5);
+            for (int i = 0; i < itemp; i++)
+            {
+                int x = 0;
+                int y = 0;
+                Tile temp = null;
+                while (!(ArrMap[x, y] is EmptyTile))
+                {
+                    x = rnd.Next(1, width - 1);
+                    y = rnd.Next(1, height - 1);
+                }
+                ArrMap[x, y] = new Gold(x, y, Tile.Type.Gold);
             }
         }
         public void UpdateVision()
@@ -422,36 +509,35 @@ namespace GADEGoblinGame
                     switch (a)
                     {
                         case 0:
-                            ArrEnemy[i].ArrVision[a] = ArrMap[ArrEnemy[i].getX(), ArrEnemy[i].getY() + 1];
+                            ArrEnemy[i].ArrVision[a] = ArrMap[ArrEnemy[i].getX()- 1, ArrEnemy[i].getY()];
                         break;
                         case 1:
-                            ArrEnemy[i].ArrVision[a] = ArrMap[ArrEnemy[i].getX(), ArrEnemy[i].getY() - 1];
+                            ArrEnemy[i].ArrVision[a] = ArrMap[ArrEnemy[i].getX() + 1, ArrEnemy[i].getY()];
                         break;
                         case 2:
-                            ArrEnemy[i].ArrVision[a] = ArrMap[ArrEnemy[i].getX() - 1, ArrEnemy[i].getY()];
+                            ArrEnemy[i].ArrVision[a] = ArrMap[ArrEnemy[i].getX(), ArrEnemy[i].getY() + 1];
                         break;
                         case 3:
-                            ArrEnemy[i].ArrVision[a] = ArrMap[ArrEnemy[i].getX() + 1, ArrEnemy[i].getY()];
+                            ArrEnemy[i].ArrVision[a] = ArrMap[ArrEnemy[i].getX(), ArrEnemy[i].getY() - 1];
                         break;
                     }          
                 }
-                
             }
             for (int a = 0; a < 4; a++) //Up, Down, Left, Right
             {
                 switch (a)
                 {
                     case 0:
-                        hero.ArrVision[a] = ArrMap[hero.getX(), hero.getY() + 1];
-                        break;
-                    case 1:
-                        hero.ArrVision[a] = ArrMap[hero.getX(), hero.getY() - 1];
-                        break;
-                    case 2:
                         hero.ArrVision[a] = ArrMap[hero.getX() - 1, hero.getY()];
                         break;
-                    case 3:
+                    case 1:
                         hero.ArrVision[a] = ArrMap[hero.getX() + 1, hero.getY()];
+                        break;
+                    case 2:
+                        hero.ArrVision[a] = ArrMap[hero.getX(), hero.getY() + 1];
+                        break;
+                    case 3:
+                        hero.ArrVision[a] = ArrMap[hero.getX(), hero.getY()- 1];
                         break;
                 }
             }
@@ -471,20 +557,29 @@ namespace GADEGoblinGame
                 case Tile.Type.Hero:
                     hero = new Hero(x, y, 0, 20);
                     temp = hero;
-                    break;
-                case Tile.Type.Enemy:
+                break;
+                case Tile.Type.Goblin:
                     Goblin goblin = new Goblin(x, y, Tile.Type.Goblin, 10, 1);
                     temp = goblin;
-                    break;
+                break;
+                case Tile.Type.Mage:
+                    Mage mage = new Mage(x, y, Tile.Type.Mage, 5, 5);
+                    temp = mage;
+                break;
             }
             return temp;
         }
+        
+
+
     }
     public class GameEngine
     {
         private Map map;
         readonly static char Hero = 'H';
         readonly static char Goblin = 'G';
+        readonly static char Mage = 'M';
+        readonly static char Gold = 'g';
         readonly static char Empty = '~';
         readonly static char Obstacle = '#';
         public GameEngine(int minW, int minH, int maxH, int maxW, int numEnemy)
@@ -498,14 +593,20 @@ namespace GADEGoblinGame
             {
                 for (int a = 0; a < map.getHeight(); a++)
                 {
-                    
+
                     switch (map.getMap()[i, a].getTileType())
                     {
                         case Tile.Type.Empty:
                             s = s + Empty;
                             break;
+                        case Tile.Type.Gold:
+                            s = s + Gold;
+                            break;
                         case Tile.Type.Goblin:
                             s = s + Goblin;
+                            break;
+                        case Tile.Type.Mage:
+                            s = s + Mage;
                             break;
                         case Tile.Type.Hero:
                             s = s + Hero;
@@ -513,13 +614,13 @@ namespace GADEGoblinGame
                         case Tile.Type.Obstacle:
                             s = s + Obstacle;
                             break;
-                    }                    
+                    }
                 }
                 s = s + "\n";
             }
             return s;
         }
-        public void MoveUp()
+        /*public void MoveUp()
         {
             map.UpdateVision();
             Tile.Type temp = (map.getMap()[map.hero.getX() - 1, (map.hero.getY())].getTileType());
@@ -566,7 +667,7 @@ namespace GADEGoblinGame
                     }
                 }
             }
-        }
+        } */
     }
 }
 
