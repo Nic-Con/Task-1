@@ -180,6 +180,105 @@ namespace GADEGoblinGame
     }
 
     [Serializable]
+    public abstract class Weapon : Item
+    {
+        public Weapon(int NewX, int NewY, Type type) : base(NewX, NewY, type)
+        {
+            X = NewX;
+            Y = NewY;
+        }
+        protected int Damage { get; set; }
+        protected int Range;
+        public virtual int GetRange()
+        {
+            return Range;
+        }
+        protected int Durability { get; set; }
+        protected int Cost { get; set; }
+        protected enum WeaponType
+        {
+            Melee,
+            Ranged
+        }
+    }
+
+    [Serializable]
+    public class MeleeWeapon : Weapon
+    {
+        public MeleeWeapon(int NewX, int NewY, Type type, MWeaponType mtype) : base(NewX, NewY, type)
+        {
+            X = NewX;
+            Y = NewY;
+            if (mtype == MWeaponType.Dagger)
+
+            {
+                Damage = 3;
+                Durability = 10;
+                Cost = 3;
+            }
+            else if (mtype == MWeaponType.Longsword)
+            {
+                Damage = 4;
+                Durability = 6;
+                Cost = 5;
+            }
+        }
+
+        public override string ToString()
+        {
+            throw new NotImplementedException();
+        }
+
+        public enum MWeaponType
+        {
+            Dagger,
+            Longsword
+        }
+        public override int GetRange()
+        {
+            return 1;
+        }
+
+    }
+
+    [Serializable]
+    public class RangedWeapon : Weapon
+    {
+        public enum RWeaponType
+        {
+            Rifle,
+            Longbow
+        }
+        public RangedWeapon(int NewX, int NewY, Type type, RWeaponType rtype) : base(NewX, NewY, type)
+        {
+            X = NewX;
+            Y = NewY;
+            if (rtype == RWeaponType.Longbow)
+            {
+                Damage = 5;
+                Range = 2;
+                Durability = 4;
+                Cost = 6;
+            }
+            else if (rtype == RWeaponType.Rifle)
+            {
+                Damage = 5;
+                Range = 3;
+                Durability = 4;
+                Cost = 7;
+            }
+        }
+        public override string ToString()
+        {
+            throw new NotImplementedException();
+        }
+        public override int GetRange()
+        {
+            return Range;
+        }
+    }
+
+    [Serializable]
     public abstract class Character : Tile
     {
         protected int MaxHP { get; set; }
@@ -393,6 +492,12 @@ namespace GADEGoblinGame
                 return false;
             }
         }
+    }
+
+    [Serializable]
+    public class Leader : Enemy
+    {
+
     }
 
     [Serializable]
