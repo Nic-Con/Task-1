@@ -13,18 +13,11 @@ namespace GADEGoblinGame
 {
     public partial class Form1 : Form
     {
-
         GameEngine GameEng;
-        Button btnShopFirst;
-        Button btnShopSecond;
-        Button btnShopThird;
-
         public Form1()
         {
             InitializeComponent();
-            btnShopFirst = btnShop1;
-            btnShopSecond= btnShop2;
-            btnShopThird = btnShop3;
+
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -34,20 +27,21 @@ namespace GADEGoblinGame
 
         private void btnStart_Click(object sender, EventArgs e)
         {
-            GameEng = new GameEngine((int)Math.Truncate(MinWid.Value), (int)Math.Truncate(MinHeight.Value), (int)Math.Truncate(MaxHeight.Value), (int)Math.Truncate(MaxWid.Value), (int)Math.Truncate(NumEnemies.Value), btnShopFirst, btnShopSecond, btnShopThird);
+            GameEng = new GameEngine((int)Math.Truncate(MinWid.Value), (int)Math.Truncate(MinHeight.Value), (int)Math.Truncate(MaxHeight.Value), (int)Math.Truncate(MaxWid.Value), (int)Math.Truncate(NumEnemies.Value));
             Output.Text = GameEng.ToString();
-            btnDown.Enabled = true;
+            /*btnDown.Enabled = true;
             btnUp.Enabled = true;
             btnLeft.Enabled = true;
-            btnRight.Enabled = true;
+            btnRight.Enabled = true;*/
             btnSave.Enabled = true;
             btnLoad.Enabled = true;
+            //btnShop1.Text = GameEng.shop.
         }
 
         private void btnUp_Click(object sender, EventArgs e)
         {
-            GameEng.MoveUp();
-            Output.Text = GameEng.ToString();
+            /*GameEng.MoveUp();
+            Output.Text = GameEng.ToString();*/
         }
 
         private void btnSave_Click(object sender, EventArgs e)
@@ -234,7 +228,7 @@ namespace GADEGoblinGame
                 Cost = 3;
                 MWeapType = MWeaponType.Dagger;
             }
-            else
+            else if (mtype == MWeaponType.Longsword)
             {
                 Damage = 4;
                 Durability = 6;
@@ -280,7 +274,7 @@ namespace GADEGoblinGame
                 Durability = 4;
                 Cost = 6;
             }
-            else
+            else if (rtype == RWeaponType.Rifle)
             {
                 Damage = 5;
                 Range = 3;
@@ -928,10 +922,6 @@ namespace GADEGoblinGame
     public class Shop
     {
         private Weapon[] arrWeapon = new Weapon[3];
-        public Weapon[] GetArrWeap()
-        {
-            return arrWeapon;
-        }
         private Random rnd = new Random();
         private Character buyer;
         public Shop(Character chr)
@@ -950,7 +940,7 @@ namespace GADEGoblinGame
             MorR = rnd.Next(1, 3);
             if (MorR == 1)
             {
-                Weap = 2;
+                Weap = rnd.Next(1, 3);
                 if (Weap == 1)
                 {
                     if (Weap == 1)
@@ -962,20 +952,18 @@ namespace GADEGoblinGame
                         arrWeapon[i] = new MeleeWeapon(0, 0, Tile.Type.Weapon, MeleeWeapon.MWeaponType.Longsword);
                     }
                 }
-            }
-            else
-            {
-                Weap = 1;
-                if (Weap == 1)
+                else
                 {
-                    arrWeapon[i] = new RangedWeapon(0, 0, Tile.Type.Weapon, RangedWeapon.RWeaponType.Longbow);
+                    if (Weap == 1)
+                    {
+                        arrWeapon[i] = new RangedWeapon(0, 0, Tile.Type.Weapon, RangedWeapon.RWeaponType.Longbow);
+                    }
+                    else if (Weap == 2)
+                    {
+                        arrWeapon[i] = new RangedWeapon(0, 0, Tile.Type.Weapon, RangedWeapon.RWeaponType.Rifle);
+                    }
                 }
-                else if (Weap == 2)
-                {
-                    arrWeapon[i] = new RangedWeapon(0, 0, Tile.Type.Weapon, RangedWeapon.RWeaponType.Rifle);
                 }
-            }
-            
             
         }
 
@@ -1006,12 +994,12 @@ namespace GADEGoblinGame
             if (arrWeapon[num] is MeleeWeapon)
             {
                 MeleeWeapon meleeWeapon = (MeleeWeapon)arrWeapon[num];
-
+                
                 if (meleeWeapon.MWeapType == MeleeWeapon.MWeaponType.Dagger)
                 {
                     temp = "Buy dagger " + meleeWeapon.GetCost() + "";
                 }
-                else
+                else if (meleeWeapon.MWeapType == MeleeWeapon.MWeaponType.Longsword)
                 {
                     temp = "Buy longsword " + meleeWeapon.GetCost() + "";
                 }
@@ -1023,7 +1011,7 @@ namespace GADEGoblinGame
                 {
                     temp = "Buy longbow " + rangedweapon.GetCost() + "";
                 }
-                else
+                else if (rangedweapon.RWeapType == RangedWeapon.RWeaponType.Rifle)
                 {
                     temp = "Buy rifle " + rangedweapon.GetCost() + "";
                 }
@@ -1036,7 +1024,6 @@ namespace GADEGoblinGame
     public class GameEngine
     {
         private Map map;
-        private Shop shop;
         readonly static char Hero = 'H';
         readonly static char Goblin = 'G';
         readonly static char Mage = 'M';
@@ -1044,17 +1031,11 @@ namespace GADEGoblinGame
         readonly static char Empty = '~';
         readonly static char Obstacle = '#';
         readonly static char Leader = 'L';
-        readonly static char Dagger = 'd';
-        readonly static char Longsword = 'l';
-        readonly static char Longbow = 'b';
-        readonly static char Rifle = 'r';
-        public GameEngine(int minW, int minH, int maxH, int maxW, int numEnemy, Button btn1, Button btn2, Button btn3)
+        readonly static char Weapon = 'w';
+        public GameEngine(int minW, int minH, int maxH, int maxW, int numEnemy)
         {
             map = new Map(minW, minH, maxH, maxW, numEnemy);
-            shop = new Shop(map.hero);
-            btn1.Text = shop.DisplayWeapon(0);
-            btn2.Text = shop.DisplayWeapon(1);
-            btn3.Text = shop.DisplayWeapon(2);
+            Shop shop = new Shop(map.hero);
         }
 
         public Map GetMap()
@@ -1099,30 +1080,7 @@ namespace GADEGoblinGame
                             s = s + Obstacle;
                             break;
                         case Tile.Type.Weapon:
-                            if (map.getMap()[i, a] is MeleeWeapon)
-                            {
-                                MeleeWeapon wTemp = (MeleeWeapon)map.getMap()[i, a];
-                                if (wTemp.MWeapType == MeleeWeapon.MWeaponType.Dagger)
-                                {
-                                    s = s + Dagger;
-                                }
-                                else
-                                {
-                                    s = s + Longsword;
-                                }
-                            }
-                            else
-                            {
-                                RangedWeapon rTemp = (RangedWeapon)map.getMap()[i, a];
-                                if (rTemp.RWeapType == RangedWeapon.RWeaponType.Longbow)
-                                {
-                                    s = s + Longbow; 
-                                }
-                                else
-                                {
-                                    s = s + Rifle;
-                                }
-                            }
+                            s = s + Weapon;
                             break;
                     }
                 }
@@ -1204,7 +1162,7 @@ namespace GADEGoblinGame
 
 
 
-        public void MoveUp()
+        /*public void MoveUp()
         {
             map.UpdateVision();
             Tile.Type temp = (map.getMap()[map.hero.getX() - 1, (map.hero.getY())].getTileType());
@@ -1218,7 +1176,7 @@ namespace GADEGoblinGame
             {
                 map.hero.Attack((Enemy)map.getMap()[map.hero.getX() - 1, (map.hero.getY())]);
             }            
-        } 
+        } */
     }
 }
 

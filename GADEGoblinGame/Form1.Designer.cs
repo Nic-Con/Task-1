@@ -263,7 +263,6 @@
             // 
             // btnShop1
             // 
-            this.btnShop1.Enabled = false;
             this.btnShop1.Location = new System.Drawing.Point(583, 185);
             this.btnShop1.Name = "btnShop1";
             this.btnShop1.Size = new System.Drawing.Size(205, 26);
@@ -272,7 +271,6 @@
             // 
             // btnShop2
             // 
-            this.btnShop2.Enabled = false;
             this.btnShop2.Location = new System.Drawing.Point(583, 214);
             this.btnShop2.Name = "btnShop2";
             this.btnShop2.Size = new System.Drawing.Size(205, 26);
@@ -281,7 +279,6 @@
             // 
             // btnShop3
             // 
-            this.btnShop3.Enabled = false;
             this.btnShop3.Location = new System.Drawing.Point(583, 243);
             this.btnShop3.Name = "btnShop3";
             this.btnShop3.Size = new System.Drawing.Size(205, 26);
