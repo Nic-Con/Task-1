@@ -188,14 +188,22 @@ namespace GADEGoblinGame
             X = NewX;
             Y = NewY;
         }
-        protected int Damage { get; set; }
+        protected int Damage;
+        public int GetDmg()
+        {
+            return Damage;
+        }
         protected int Range;
         public virtual int GetRange()
         {
             return Range;
         }
         protected int Durability { get; set; }
-        protected int Cost { get; set; }
+        protected int Cost;
+        public int GetCost()
+        {
+            return Cost;
+        }
         protected enum WeaponType
         {
             Melee,
@@ -206,6 +214,7 @@ namespace GADEGoblinGame
     [Serializable]
     public class MeleeWeapon : Weapon
     {
+        public MWeaponType MWeapType { get; set; } 
         public MeleeWeapon(int NewX, int NewY, Type type, MWeaponType mtype) : base(NewX, NewY, type)
         {
             X = NewX;
@@ -216,12 +225,14 @@ namespace GADEGoblinGame
                 Damage = 3;
                 Durability = 10;
                 Cost = 3;
+                MWeapType = MWeaponType.Dagger;
             }
             else if (mtype == MWeaponType.Longsword)
             {
                 Damage = 4;
                 Durability = 6;
                 Cost = 5;
+                MWeapType = MWeaponType.Longsword;
             }
         }
 
@@ -245,6 +256,7 @@ namespace GADEGoblinGame
     [Serializable]
     public class RangedWeapon : Weapon
     {
+        public RWeaponType RWeapType { get; set; }
         public enum RWeaponType
         {
             Rifle,
@@ -285,9 +297,11 @@ namespace GADEGoblinGame
         protected int MaxHP { get; set; }
         protected int HP { get; set; }
         protected int Damage { get; set; }
+        protected int range = 1;
         public Tile[] ArrVision = new Tile[4];  //Up, Down, Left, Right
         public int AmountGold { get; set; }
-
+        protected Weapon EquippedWeapon;
+        
         public enum Movement
         {
             None,
@@ -346,7 +360,7 @@ namespace GADEGoblinGame
         }
         public virtual bool CheckRange(Character Target)
         {
-            if (DistanceTo(Target) == 1)
+            if (DistanceTo(Target) == range)
             {
                 return true;
             }
@@ -379,8 +393,26 @@ namespace GADEGoblinGame
             {
                 AmountGold = AmountGold + ((Gold)item).Amount;
             }
+            else if (item.getTileType() == Tile.Type.Weapon)
+            {
+                Equip((Weapon)item);
+            }
         }
+        public void Equip(Weapon weap)
+        {
+            EquippedWeapon = weap;
+            Damage = weap.GetDmg();
+            range = weap.GetRange();
 
+        }
+        public void loot(Character chr)
+        {
+            this.AmountGold = this.AmountGold + chr.AmountGold;
+            if (!(this is Mage))
+            {
+                Equip(chr.EquippedWeapon);
+            }
+        }
         public abstract Movement ReturnMove(Movement move);
         public abstract override string ToString();
     }
@@ -413,6 +445,8 @@ namespace GADEGoblinGame
             HP = 10;
             MaxHP = 10;
             Damage = 1;
+            EquippedWeapon = new MeleeWeapon(0, 0, Tile.Type.Weapon, MeleeWeapon.MWeaponType.Dagger);
+            AmountGold = 1;
         }
 
         public override Movement ReturnMove(Movement move)
@@ -475,6 +509,7 @@ namespace GADEGoblinGame
             HP = 5;
             MaxHP = 5;
             Damage = 5;
+            AmountGold = 3;
         }
 
         public override Movement ReturnMove(Movement move)
@@ -613,6 +648,7 @@ namespace GADEGoblinGame
             HP = NewMaxHP;
             MaxHP = NewMaxHP;
             Damage = 2;
+            AmountGold = 0;
         }
 
         public override Movement ReturnMove(Movement move)
@@ -730,14 +766,20 @@ namespace GADEGoblinGame
             ArrEnemy = new Enemy[numEnemy];
             for (int i = 0; i < numEnemy; i++)
             {
-                if (rnd.Next(1, 7) < 6)
+                int temp = rnd.Next(1, 11);
+                if (temp < 6)
                 {
                     ArrEnemy[i] = (Enemy)Create(Tile.Type.Goblin);
                     ArrMap[ArrEnemy[i].getX(), ArrEnemy[i].getY()] = ArrEnemy[i];
                 }
-                else
+                else if (temp < 8)
                 {
                     ArrEnemy[i] = (Enemy)Create(Tile.Type.Mage);
+                    ArrMap[ArrEnemy[i].getX(), ArrEnemy[i].getY()] = ArrEnemy[i];
+                }
+                else
+                {
+                    ArrEnemy[i] = (Enemy)Create(Tile.Type.leader);
                     ArrMap[ArrEnemy[i].getX(), ArrEnemy[i].getY()] = ArrEnemy[i];
                 }
 
@@ -753,6 +795,39 @@ namespace GADEGoblinGame
                     y = rnd.Next(1, height - 1);
                 }
                 ArrMap[x, y] = new Gold(x, y, Tile.Type.Gold);
+            }
+            itemp = rnd.Next(1, 5);
+            for (int i = 0; i < itemp; i++)
+            {
+                int x = 0;
+                int y = 0;
+                while (!(ArrMap[x, y] is EmptyTile))
+                {
+                    x = rnd.Next(1, width - 1);
+                    y = rnd.Next(1, height - 1);
+                }
+                if (rnd.Next(1,3) == 1)
+                {
+                    if (rnd.Next(1,3) ==1)
+                    {
+                        ArrMap[x, y] = new MeleeWeapon(x,y,Tile.Type.Weapon,MeleeWeapon.MWeaponType.Dagger);
+                    }
+                    else
+                    {
+                        ArrMap[x, y] = new MeleeWeapon(x, y, Tile.Type.Weapon, MeleeWeapon.MWeaponType.Longsword);
+                    }
+                }
+                else
+                {
+                    if (rnd.Next(1, 3) == 1)
+                    {
+                        ArrMap[x, y] = new RangedWeapon(x,y,Tile.Type.Weapon, RangedWeapon.RWeaponType.Longbow);
+                    }
+                    else
+                    {
+                        ArrMap[x, y] = new RangedWeapon(x, y, Tile.Type.Weapon, RangedWeapon.RWeaponType.Rifle);
+                    }
+                }
             }
         }
         public void UpdateVision()
@@ -821,6 +896,10 @@ namespace GADEGoblinGame
                     Mage mage = new Mage(x, y, Tile.Type.Mage, 5, 5);
                     temp = mage;
                     break;
+                case Tile.Type.leader:
+                    Leader leader = new Leader(x, y, Tile.Type.leader, 20, 2);
+                    temp = leader;
+                    break;
             }
             return temp;
         }
@@ -841,26 +920,102 @@ namespace GADEGoblinGame
     [Serializable]
     public class Shop
     {
-        private Weapon[] arrWeapon;
+        private Weapon[] arrWeapon = new Weapon[3];
         private Random rnd = new Random();
         private Character buyer;
         public Shop(Character chr)
         {
-            int MorR;
-            int Weap;
             buyer = chr;
             for (int i = 0; i < 3; i++)
             {
-                MorR = rnd.Next(1, 3);
-                if (MorR == 1)
+                RandomWeapon(i);
+            }
+        }
+        public void RandomWeapon(int i)
+        {
+
+            int MorR;
+            int Weap;
+            MorR = rnd.Next(1, 3);
+            if (MorR == 1)
+            {
+                Weap = rnd.Next(1, 3);
+                if (Weap == 1)
                 {
-                    Weap = rnd.Next(1, 3);
                     if (Weap == 1)
                     {
-
+                        arrWeapon[i] = new MeleeWeapon(0, 0, Tile.Type.Weapon, MeleeWeapon.MWeaponType.Dagger);
+                    }
+                    else if (Weap == 2)
+                    {
+                        arrWeapon[i] = new MeleeWeapon(0, 0, Tile.Type.Weapon, MeleeWeapon.MWeaponType.Longsword);
                     }
                 }
+                else
+                {
+                    if (Weap == 1)
+                    {
+                        arrWeapon[i] = new RangedWeapon(0, 0, Tile.Type.Weapon, RangedWeapon.RWeaponType.Longbow);
+                    }
+                    else if (Weap == 2)
+                    {
+                        arrWeapon[i] = new RangedWeapon(0, 0, Tile.Type.Weapon, RangedWeapon.RWeaponType.Rifle);
+                    }
+                }
+                }
+            
+        }
+
+        public bool CanBuy(int num)
+        {
+            bool temp;
+            if (buyer.AmountGold >= arrWeapon[num].GetCost())
+            {
+                temp = true;
             }
+            else
+            {
+                temp = false;
+            }
+            return temp;
+        }
+
+        public void Buy(int num)
+        {
+            buyer.AmountGold = buyer.AmountGold - arrWeapon[num].GetCost();
+            buyer.Pickup(arrWeapon[num]);
+            RandomWeapon(num);
+        }
+
+        public string DisplayWeapon(int num)
+        {
+            string temp = "";
+            if (arrWeapon[num] is MeleeWeapon)
+            {
+                MeleeWeapon meleeWeapon = (MeleeWeapon)arrWeapon[num];
+                
+                if (meleeWeapon.MWeapType == MeleeWeapon.MWeaponType.Dagger)
+                {
+                    temp = "Buy dagger " + meleeWeapon.GetCost() + "";
+                }
+                else if (meleeWeapon.MWeapType == MeleeWeapon.MWeaponType.Longsword)
+                {
+                    temp = "Buy longsword " + meleeWeapon.GetCost() + "";
+                }
+            }
+            else if (arrWeapon[num] is RangedWeapon)
+            {
+                RangedWeapon rangedweapon = (RangedWeapon)arrWeapon[num];
+                if (rangedweapon.RWeapType == RangedWeapon.RWeaponType.Longbow)
+                {
+                    temp = "Buy longbow " + rangedweapon.GetCost() + "";
+                }
+                else if (rangedweapon.RWeapType == RangedWeapon.RWeaponType.Rifle)
+                {
+                    temp = "Buy rifle " + rangedweapon.GetCost() + "";
+                }
+            }
+            return temp;
         }
     }
 
@@ -874,6 +1029,8 @@ namespace GADEGoblinGame
         readonly static char Gold = 'g';
         readonly static char Empty = '~';
         readonly static char Obstacle = '#';
+        readonly static char Leader = 'L';
+        readonly static char Weapon = 'w';
         public GameEngine(int minW, int minH, int maxH, int maxW, int numEnemy)
         {
             map = new Map(minW, minH, maxH, maxW, numEnemy);
@@ -914,8 +1071,14 @@ namespace GADEGoblinGame
                         case Tile.Type.Hero:
                             s = s + Hero;
                             break;
+                        case Tile.Type.leader:
+                            s = s + Leader;
+                            break;
                         case Tile.Type.Obstacle:
                             s = s + Obstacle;
+                            break;
+                        case Tile.Type.Weapon:
+                            s = s + Weapon;
                             break;
                     }
                 }
