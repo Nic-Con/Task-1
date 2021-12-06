@@ -35,6 +35,7 @@ namespace GADEGoblinGame
             btnRight.Enabled = true;*/
             btnSave.Enabled = true;
             btnLoad.Enabled = true;
+            //btnShop1.Text = GameEng.shop.
         }
 
         private void btnUp_Click(object sender, EventArgs e)
@@ -1034,6 +1035,7 @@ namespace GADEGoblinGame
         public GameEngine(int minW, int minH, int maxH, int maxW, int numEnemy)
         {
             map = new Map(minW, minH, maxH, maxW, numEnemy);
+            Shop shop = new Shop(map.hero);
         }
 
         public Map GetMap()

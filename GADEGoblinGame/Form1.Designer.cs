@@ -46,6 +46,9 @@
             this.btnRight = new System.Windows.Forms.Button();
             this.btnSave = new System.Windows.Forms.Button();
             this.btnLoad = new System.Windows.Forms.Button();
+            this.btnShop1 = new System.Windows.Forms.Button();
+            this.btnShop2 = new System.Windows.Forms.Button();
+            this.btnShop3 = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.MinWid)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.MaxWid)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.MaxHeight)).BeginInit();
@@ -195,7 +198,7 @@
             // 
             this.btnUp.Enabled = false;
             this.btnUp.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnUp.Location = new System.Drawing.Point(550, 246);
+            this.btnUp.Location = new System.Drawing.Point(449, 246);
             this.btnUp.Name = "btnUp";
             this.btnUp.Size = new System.Drawing.Size(56, 51);
             this.btnUp.TabIndex = 12;
@@ -207,7 +210,7 @@
             // 
             this.btnLeft.Enabled = false;
             this.btnLeft.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnLeft.Location = new System.Drawing.Point(494, 303);
+            this.btnLeft.Location = new System.Drawing.Point(393, 303);
             this.btnLeft.Name = "btnLeft";
             this.btnLeft.Size = new System.Drawing.Size(56, 51);
             this.btnLeft.TabIndex = 13;
@@ -218,7 +221,7 @@
             // 
             this.btnDown.Enabled = false;
             this.btnDown.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnDown.Location = new System.Drawing.Point(550, 303);
+            this.btnDown.Location = new System.Drawing.Point(449, 303);
             this.btnDown.Name = "btnDown";
             this.btnDown.Size = new System.Drawing.Size(56, 51);
             this.btnDown.TabIndex = 14;
@@ -229,7 +232,7 @@
             // 
             this.btnRight.Enabled = false;
             this.btnRight.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnRight.Location = new System.Drawing.Point(606, 303);
+            this.btnRight.Location = new System.Drawing.Point(505, 303);
             this.btnRight.Name = "btnRight";
             this.btnRight.Size = new System.Drawing.Size(56, 51);
             this.btnRight.TabIndex = 15;
@@ -258,11 +261,38 @@
             this.btnLoad.UseVisualStyleBackColor = true;
             this.btnLoad.Click += new System.EventHandler(this.btnLoad_Click);
             // 
+            // btnShop1
+            // 
+            this.btnShop1.Location = new System.Drawing.Point(583, 185);
+            this.btnShop1.Name = "btnShop1";
+            this.btnShop1.Size = new System.Drawing.Size(205, 26);
+            this.btnShop1.TabIndex = 18;
+            this.btnShop1.UseVisualStyleBackColor = true;
+            // 
+            // btnShop2
+            // 
+            this.btnShop2.Location = new System.Drawing.Point(583, 214);
+            this.btnShop2.Name = "btnShop2";
+            this.btnShop2.Size = new System.Drawing.Size(205, 26);
+            this.btnShop2.TabIndex = 19;
+            this.btnShop2.UseVisualStyleBackColor = true;
+            // 
+            // btnShop3
+            // 
+            this.btnShop3.Location = new System.Drawing.Point(583, 243);
+            this.btnShop3.Name = "btnShop3";
+            this.btnShop3.Size = new System.Drawing.Size(205, 26);
+            this.btnShop3.TabIndex = 20;
+            this.btnShop3.UseVisualStyleBackColor = true;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 361);
+            this.Controls.Add(this.btnShop3);
+            this.Controls.Add(this.btnShop2);
+            this.Controls.Add(this.btnShop1);
             this.Controls.Add(this.btnLoad);
             this.Controls.Add(this.btnSave);
             this.Controls.Add(this.btnRight);
@@ -314,6 +344,9 @@
         private System.Windows.Forms.Button btnRight;
         private System.Windows.Forms.Button btnSave;
         private System.Windows.Forms.Button btnLoad;
+        private System.Windows.Forms.Button btnShop1;
+        private System.Windows.Forms.Button btnShop2;
+        private System.Windows.Forms.Button btnShop3;
     }
 }
 
